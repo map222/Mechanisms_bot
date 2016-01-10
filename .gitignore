@@ -1,4 +1,7 @@
-*__pychache__
+*.log
+twitter_api_key.py
+__pycache__/
+*.py[cod]
 /notebooks/.ipynb_checkpoints
 
 # Windows image file caches
