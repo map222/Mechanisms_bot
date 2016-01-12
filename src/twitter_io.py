@@ -21,5 +21,5 @@ def tweet_new_sentence( new_sentences, tweeted_sentences):
         if cur_sent not in tweeted_sentences:
             #pdb.set_trace()
             twitter_api.update_status(cur_sent['mech_sent'][:115] + ' ' + pubmed_url.format(cur_sent['PMID']))
-            tweeted_sentences.extend(cur_sent)
+            tweeted_sentences.append(cur_sent)
             return tweeted_sentences

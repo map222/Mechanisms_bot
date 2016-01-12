@@ -39,6 +39,9 @@ def get_pubmed_abstracts( pubmed_ids):
     Returns:
     abstracts: a list of (long) strings containing abstracts for articles
     '''
+    def flatten_abstract_text(article):
+        #return ' '.join([x.text for x in article.findall('AbstractText') if x.text])
+        return ' '.join(str([x.text for x in article.findall('AbstractText') ]) )
     
     base_url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/e{}.fcgi'
     chunk_size = 500
@@ -51,13 +54,16 @@ def get_pubmed_abstracts( pubmed_ids):
         #pdb.set_trace()
         # each 'abstract' can have multiple AbstractText fields, so need to flatten it
         articles = [ x for x in pubmed_tree.findall('./PubmedArticle/MedlineCitation/Article/Abstract')]
-        def flatten_abstract_text(article):
-            return ' '.join([x.text for x in article.findall('AbstractText')])
-        abstracts.extend( list(map(flatten_abstract_text, articles)))
+        try:
+            next_abstracts = list(map(flatten_abstract_text, articles))
+            abstracts.extend( next_abstracts )
+        except:
+            print('Problem parsing abstract in range{0},{1}'.format(i, i+chunksize) )
+            continue
         
-        time.sleep(0.5)
-        
-    abstracts = [x for x in abstracts if x] # skip the rare "None" abstracts
+        time.sleep(0.2)
+    
+    #abstracts = [x for x in abstracts if x] # skip the rare "None" abstracts
     return abstracts
 
 '''
@@ -67,22 +73,3 @@ Article has children: Journal, ArticleTitle, and Abstract
 
 Abstract has child: AbstractText
 '''
-
-from nltk.tokenize import sent_tokenize, word_tokenize
-def get_mech_sent(cur_abstract, cur_pmid):
-    ''' Identify sentences which have mechanisms and understood
-    
-    Returns: a dictionary containing:
-    mech_sent: mechanisms understood sentence
-    PMID
-    '''
-    
-    mech_words = {'mechanism', 'mechanisms', 'pathway', 'pathways', 'underpinnings'}
-    understood_words = {'understood', 'unknown', 'unclear'}
-    cur_sents = sent_tokenize(cur_abstract)
-    mech_sent = [sent for sent in cur_sents if mech_words.intersection(set(  word_tokenize(sent) ))]
-    understood_sent = [sent for sent in mech_sent if understood_words.intersection(set(  word_tokenize(sent) ))]
-    if len(understood_sent) >0: # de-nest the list if it exists
-        understood_sent = understood_sent[0] 
-    #understood_sent = [x for x in understood_sent if x] # not sure why I had this
-    return {'mech_sent':understood_sent, 'PMID': cur_pmid}

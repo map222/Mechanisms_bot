@@ -12,15 +12,16 @@ handler = logging.FileHandler('mechanisms_bot.log')
 handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
 
-def get_recent_mech_sentences():
+def get_recent_mech_sentences(num_pmids = 100):
     '''
     Queries Pubmed for recent papers using mechanisms understood syntax. Then get the abstracts. 
     Then does some NLP to get the sentences out, and returns them.
     
     Returns:
     good_sents: a list of dictionaries containing mechanisms sentences and PMIDs'''
+
     logger.info('Getting recent papers')
-    recent_pmids = pubmed_io.get_pubmed_ids(100)
+    recent_pmids = pubmed_io.get_pubmed_ids(num_pmids)
     logger.info('Got {} recent PubMed IDs'.format(len(recent_pmids)))
     logger.info('Getting abstracts')
     recent_abstracts = pubmed_io.get_pubmed_abstracts( recent_pmids)
@@ -43,7 +44,7 @@ def main():
     
     # save the new tweeted_
     with open('tweeted_sentences.pickle', 'wb') as pickle_file:
-        pickle.dump(tweeted_sentences, pickle_file )
+        pickle.dump(tweeted_sentences, pickle_file)
     
     return new_sentences, tweeted_sentences
 
