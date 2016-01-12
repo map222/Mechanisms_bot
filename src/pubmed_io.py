@@ -40,8 +40,7 @@ def get_pubmed_abstracts( pubmed_ids):
     abstracts: a list of (long) strings containing abstracts for articles
     '''
     def flatten_abstract_text(article):
-        #return ' '.join([x.text for x in article.findall('AbstractText') if x.text])
-        return ' '.join(str([x.text for x in article.findall('AbstractText') ]) )
+        return ' '.join([x.text for x in article.findall('AbstractText') if x.text] )
     
     base_url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/e{}.fcgi'
     chunk_size = 500
